@@ -1,0 +1,44 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: ID!
+  name: String!
+}
+
+type PaginatedUserResponse {
+  data: [User!]!
+  nextCursor: [String!]
+  total: Int!
+}
+
+type Message {
+  id: ID
+  from: String!
+  to: String!
+  message: String!
+  participants: [String!]!
+  sender: User!
+  createdAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: [String!]
+}
+
+type PaginatedMessageResponse {
+  items: [Message!]!
+  pageInfo: PageInfo!
+}
+
+type Query {
+  searchUsers(name: String!, limit: Int! = 10, cursor: [String!]): PaginatedUserResponse!
+  getChatHistory(userA: String!, userB: String!, limit: Int! = 10, cursor: [String!]): PaginatedMessageResponse!
+}
