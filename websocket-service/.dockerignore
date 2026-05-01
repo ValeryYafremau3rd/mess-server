@@ -1,0 +1,17 @@
+# Dependency folders
+node_modules
+npm-debug.log
+
+# Build output
+dist
+.runtime
+
+# Local secrets and config
+.env
+.env.*
+.git
+.gitignore
+
+# Docker specific
+Dockerfile
+docker-compose.yml

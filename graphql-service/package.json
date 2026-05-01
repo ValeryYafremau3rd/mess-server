@@ -27,7 +27,7 @@
     "@nestjs/common": "^11.1.19",
     "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.1.19",
-    "@nestjs/elasticsearch": "^10.0.2",
+    "@nestjs/elasticsearch": "^11.1.0",
     "@nestjs/graphql": "^13.3.0",
     "@nestjs/mongoose": "^11.0.4",
     "@nestjs/platform-express": "^11.1.19",

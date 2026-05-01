@@ -1,10 +1,55 @@
 services:
+  rest:
+    build: ./rest-api/
+    ports:
+      - "3000:3000"
+    environment:
+      - JWT_SECRET='SECRET_KEY'
+      - ELASTICSEARCH_NODE=http://elasticsearch:9200
+      - REDIS_HOST=redis
+      - DB_HOST=db
+      - DB_USERNAME=root
+      - DB_PASSWORD=root_password
+    networks:
+      - basic-network
+    depends_on:
+      - db
+      - redis
+      - elasticsearch
+  websocket:
+    build: ./websocket-service/
+    ports:
+      - "3002:3002"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/mess-db
+      - REDIS_URL=redis://redis:6379
+    networks:
+      - basic-network
+    depends_on:
+      - mongodb
+      - redis
+  graphql:
+    build: ./graphql-service/
+    ports:
+      - "3003:3003"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/mess-db
+      - ELASTICSEARCH_NODE=http://elasticsearch:9200
+    networks:
+      - basic-network
+    depends_on:
+      - mongodb
+      - elasticsearch
   redis:
     image: redis:7-alpine
     container_name: redis_dev
     ports:
       - "6379:6379"
     restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+    - basic-network
   db:
     image: postgres:15
     container_name: postgres-db
@@ -15,6 +60,10 @@ services:
       POSTGRES_DB: mess-db
     ports:
       - "5432:5432"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+    - basic-network
     volumes:
       - postgres_data:/var
   mongodb:
@@ -24,6 +73,10 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+    - basic-network
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
     container_name: elasticsearch
@@ -40,14 +93,18 @@ services:
         hard: -1
     ports:
       - 9200:9200
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - es_data:/usr/share/elasticsearch/data
+    networks:
+    - basic-network
 volumes:
   postgres_data:
   mongo_data:
   es_data:
     driver: local
 
-##networks:
-##  basic-network:
-##    driver: bridge
+networks:
+  basic-network:
+    driver: bridge
