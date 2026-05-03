@@ -1,10 +1,21 @@
 services:
-  rest:
-    build: ./rest-api/
+  api-gateway:
+    image: kong:latest
+    volumes:
+      - ./kong.yml:/usr/local/kong/declarations/kong.yml
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarations/kong.yml
+      KONG_PROXY_LISTEN: 0.0.0.0:3000
     ports:
       - "3000:3000"
+    networks:
+      - basic-network
+  rest:
+    build: ./rest-api/
     environment:
-      - JWT_SECRET='SECRET_KEY'
+      - JWT_SECRET=SECRET_KEY
+      - ISSUER_ID=issuer-identifier
       - ELASTICSEARCH_NODE=http://elasticsearch:9200
       - REDIS_HOST=redis
       - DB_HOST=db
@@ -18,8 +29,6 @@ services:
       - elasticsearch
   websocket:
     build: ./websocket-service/
-    ports:
-      - "3002:3002"
     environment:
       - MONGODB_URI=mongodb://mongodb:27017/mess-db
       - REDIS_URL=redis://redis:6379
@@ -30,8 +39,6 @@ services:
       - redis
   graphql:
     build: ./graphql-service/
-    ports:
-      - "3003:3003"
     environment:
       - MONGODB_URI=mongodb://mongodb:27017/mess-db
       - ELASTICSEARCH_NODE=http://elasticsearch:9200
